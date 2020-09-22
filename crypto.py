@@ -24,7 +24,7 @@ def encrypt_caesar(plaintext, offset):
 # Arguments: string, integer
 # Returns: string
 def decrypt_caesar(ciphertext, offset):
-    pass
+    return encrypt_caesar(ciphertext, -offset)
 
 # Vigenere Cipher
 # Arguments: string, string
@@ -61,6 +61,7 @@ def decrypt_mhkc(ciphertext, private_key):
 def main():
     # Testing code here
     print(encrypt_caesar("PYTHON!", 3))
+    print(decrypt_caesar("SBWKRQ", 3))
     pass
 
 if __name__ == "__main__":
