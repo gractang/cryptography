@@ -49,18 +49,21 @@ def encrypt_vigenere(plaintext, keyword):
     for ch in plaintext:
         offset = ord(key[pos])-ord('A')
         index = (ord(ch) + offset)
+
+        # Do the wrapping thing
         ch_new = chr(index) if index-ord('A') < 26 else chr(index-26)
         ciphertext += ch_new
         pos += 1
     return ciphertext
 
-
 # Arguments: string, string
 # Returns: string
 def decrypt_vigenere(ciphertext, keyword):
-    pass
-
-
+    key = ""
+    for ch in keyword:
+        index = ord(ch)-ord('A')
+        key += string.ascii_uppercase[len(string.ascii_uppercase)-index]
+    return encrypt_vigenere(ciphertext, key)
 
 # Merkle-Hellman Knapsack Cryptosystem
 # Arguments: integer
@@ -88,6 +91,7 @@ def main():
     # print(encrypt_caesar("PYTHON!", 3))
     # print(decrypt_caesar("SBWKRQ", 3))
     print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
+    print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
 
 if __name__ == "__main__":
     main()
