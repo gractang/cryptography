@@ -1,8 +1,25 @@
+import string
+# import this
+
 # Caesar Cipher
+
+def build_corresponding(offset):
+    normal = string.ascii_uppercase
+    shifted = normal[offset:] + normal[:offset]
+    return shifted
+
 # Arguments: string, integer
 # Returns: string
 def encrypt_caesar(plaintext, offset):
-    pass
+    shifted = build_corresponding(offset)
+    ciphertext = ""
+    for ch in plaintext:
+        if ch.isalpha():
+            ciphertext += shifted[ord(ch)-ord('A')]
+        else:
+            ciphertext += ch
+    return ciphertext
+
 
 # Arguments: string, integer
 # Returns: string
@@ -43,6 +60,7 @@ def decrypt_mhkc(ciphertext, private_key):
 
 def main():
     # Testing code here
+    print(encrypt_caesar("PYTHON!", 3))
     pass
 
 if __name__ == "__main__":
