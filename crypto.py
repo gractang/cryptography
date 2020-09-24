@@ -92,13 +92,17 @@ def find_r(q):
 # Returns: tuple (W, Q, R) - W a length-n tuple of integers, Q and R both integers
 def generate_private_key(n=8):
     W, Q = make_superincreasing_sequence(n)
-    return (W, Q, R)
-    
+    return (W, Q, find_r(Q))
+
 
 # Arguments: tuple (W, Q, R) - W a length-n tuple of integers, Q and R both integers
 # Returns: tuple B - a length-n tuple of integers
 def create_public_key(private_key):
-    pass
+    B = []
+    W, Q, R = private_key
+    for i in range(len(W)):
+        B.append(R * W[i] % Q)
+    return tuple(B)
 
 # Arguments: string, tuple (W, Q, R)
 # Returns: list of integers
@@ -116,7 +120,9 @@ def main():
     # print(decrypt_caesar("SBWKRQ", 3))
     # print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
     # print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
-    generate_private_key()
+    private_key = generate_private_key()
+    print(private_key)
+    print(create_public_key(private_key))
 
 if __name__ == "__main__":
     main()
