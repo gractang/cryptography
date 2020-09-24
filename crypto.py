@@ -1,4 +1,6 @@
 import string
+import random
+import math
 # import this
 
 # Caesar Cipher
@@ -65,11 +67,33 @@ def decrypt_vigenere(ciphertext, keyword):
         key += string.ascii_uppercase[len(string.ascii_uppercase)-index]
     return encrypt_vigenere(ciphertext, key)
 
+
 # Merkle-Hellman Knapsack Cryptosystem
+
+# Makes a superincreasing sequence of length length
+def make_superincreasing_sequence(length):
+    seq = [random.randint(1,10)]
+    total = seq[0]
+    for i in range(length - 1):
+        seq.append(random.randint(total + 1, 2 * total))
+        total += seq[i+1]
+    q = random.randint(total+1, 2 * total)
+    return (tuple(seq), q)
+
+# Finds a number r that is coprime with q 
+# i.e. gcd(r, q) == 1
+def find_r(q):
+    r = random.randint(2, q)
+    while math.gcd(r, q) != 1:
+        r = random.randint(2, q)
+    return r
+
 # Arguments: integer
 # Returns: tuple (W, Q, R) - W a length-n tuple of integers, Q and R both integers
 def generate_private_key(n=8):
-    pass
+    W, Q = make_superincreasing_sequence(n)
+    return (W, Q, R)
+    
 
 # Arguments: tuple (W, Q, R) - W a length-n tuple of integers, Q and R both integers
 # Returns: tuple B - a length-n tuple of integers
@@ -90,8 +114,9 @@ def main():
     # Testing code here
     # print(encrypt_caesar("PYTHON!", 3))
     # print(decrypt_caesar("SBWKRQ", 3))
-    print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
-    print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
+    # print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
+    # print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
+    generate_private_key()
 
 if __name__ == "__main__":
     main()
