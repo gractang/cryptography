@@ -104,15 +104,76 @@ def create_public_key(private_key):
         B.append(R * W[i] % Q)
     return tuple(B)
 
+def base_conversion(b1, b2, numb1, num_bits):
+    numb2 = []
+    for i in range(num_bits):
+        current_power = b2**(num_bits-i-1)
+        numb2.append(numb1 // current_power)
+        numb1 %= current_power
+    return numb2
+
 # Arguments: string, tuple (W, Q, R)
 # Returns: list of integers
 def encrypt_mhkc(plaintext, public_key):
-    pass
+    base1 = 10
+    base2 = 2
+    all_Cs = []
+    for ch in plaintext:
+        asc = ord(ch)
+        num_bits = 8
+        ascb2 = base_conversion(base1, base2, asc, num_bits)
+        c = 0
+        for i in range(num_bits):
+            c += ascb2[i] * public_key[i]
+        all_Cs.append(c)
+    return all_Cs
+
+# finds the modular inverse
+def find_mod_inverse(R, Q):
+    q = Q 
+    y = 0
+    inv = 1
+  
+    if (q == 1) : 
+        return 0
+  
+    while (R > 1) : 
+        quo = R // q 
+        t = q  
+        q = R % q 
+        R = t 
+        t = y 
+        y = inv - quo * y 
+        inv = t 
+  
+    # Make inverse positive 
+    if (inv < 0) : 
+        inv += Q
+  
+    return inv
 
 # Arguments: list of integers, tuple B - a length-n tuple of integers
 # Returns: bytearray or str of plaintext
 def decrypt_mhkc(ciphertext, private_key):
-    pass
+    W, Q, R = private_key
+    S = find_mod_inverse(R, Q)
+    cprimes = []
+    plaintext = []
+    for c in ciphertext:
+        cprimes.append(c * S % Q)
+    for cprime in cprimes:
+        indices = set()
+        for i in range(len(W)):
+            current = W[len(W)-i-1]
+            if current <= cprime:
+                indices.add(len(W)-i)
+                cprime -= current
+        ascval = 0
+        for i in indices:
+            ascval += 2 ** (len(W)-i)
+        plaintext.append(chr(ascval))
+    return "".join(plaintext)
+
 
 def main():
     # Testing code here
@@ -120,9 +181,21 @@ def main():
     # print(decrypt_caesar("SBWKRQ", 3))
     # print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
     # print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
+
+    # should print 38
+    # print(find_mod_inverse(17, 43))
+
+    # the below is the wikipedia example
+    # W = (2, 7, 11, 21, 42, 89, 180, 354)
+    # Q = 881
+    # R = 588
+    # private_key = (W, Q, R)
+    # print(encrypt_mhkc("a", create_public_key(private_key)))
+    # print(decrypt_mhkc([1129], private_key))
+
     private_key = generate_private_key()
-    print(private_key)
-    print(create_public_key(private_key))
+    public_key = create_public_key(private_key)
+    print(decrypt_mhkc(encrypt_mhkc("PLZWORK", public_key), private_key))
 
 if __name__ == "__main__":
     main()
