@@ -64,7 +64,7 @@ def decrypt_vigenere(ciphertext, keyword):
     key = ""
     for ch in keyword:
         index = ord(ch)-ord('A')
-        key += string.ascii_uppercase[len(string.ascii_uppercase)-index]
+        key += string.ascii_uppercase[(len(string.ascii_uppercase)-index)%len(string.ascii_uppercase)]
     return encrypt_vigenere(ciphertext, key)
 
 
@@ -128,25 +128,40 @@ def encrypt_mhkc(plaintext, public_key):
         all_Cs.append(c)
     return all_Cs
 
-# finds the modular inverse
+# finds the modular inverse using Euclidean Algorithm
+# assumes R, Q are coprime
 def find_mod_inverse(R, Q):
-    q = Q 
+    q = Q
     y = 0
     inv = 1
   
-    if (q == 1) : 
+    # technically this should not happen, but just in case... gotta be thorough u know
+    if (Q == 1):
         return 0
   
-    while (R > 1) : 
-        quo = R // q 
-        t = q  
-        q = R % q 
+    while (R > 1): 
+        # integer division to find quotient of "current" mod thing
+        quo = R // q
+
+        # temp variable to store q
+        t = q
+
+        # update q to be R mod q
+        q = R % q
+
+        # set R to what was previously q
         R = t 
+
+        # change temp variable to store y
         t = y 
+
+        # update y
         y = inv - quo * y 
+
+        # set inverse to be old y
         inv = t 
   
-    # Make inverse positive 
+    # make inverse positive if it was negative
     if (inv < 0) : 
         inv += Q
   
@@ -174,6 +189,15 @@ def decrypt_mhkc(ciphertext, private_key):
         plaintext.append(chr(ascval))
     return "".join(plaintext)
 
+def get_list_of_lists(filename):
+    f = open(filename, "r")
+    list_of_lists = []
+    for line in f:
+        stripped_line = line.strip()
+        line_list = stripped_line.split(",")
+        list_of_lists.append(line_list)
+    f.close()
+    return list_of_lists
 
 def main():
     # Testing code here
@@ -181,6 +205,31 @@ def main():
     # print(decrypt_caesar("SBWKRQ", 3))
     # print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
     # print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
+
+    caesar_data = get_list_of_lists("caesar.txt")
+    for lst in caesar_data:
+        if encrypt_caesar(lst[0], int(lst[1])) != lst[2]:
+            print("en c: " + str(lst))
+        if decrypt_caesar(lst[2], int(lst[1])) != lst[0]:
+            print("de c: " + str(lst))
+
+    vigenere_data = get_list_of_lists("vigenere.txt")
+    for lst in vigenere_data:
+        if encrypt_vigenere(lst[0], lst[1]) != lst[2]:
+            print("en v: " + str(lst))
+        if decrypt_vigenere(lst[2], lst[1]) != lst[0]:
+            print("de v: " + str(lst))
+
+    
+    private_key = ((5, 10, 28, 59, 144, 309, 688, 2413), 5575, 2)
+    public_key = (10, 20, 56, 118, 288, 618, 1376, 4826)
+    plaintext = ""
+    ciphertext = []
+
+    if encrypt_mhkc(plaintext, public_key) != ciphertext:
+        print("en mhkc: " + str(lst))
+    if decrypt_mhkc(ciphertext, private_key) != plaintext:
+        print("de mhkc: " + str(lst))
 
     # should print 38
     # print(find_mod_inverse(17, 43))
@@ -193,9 +242,9 @@ def main():
     # print(encrypt_mhkc("a", create_public_key(private_key)))
     # print(decrypt_mhkc([1129], private_key))
 
-    private_key = generate_private_key()
-    public_key = create_public_key(private_key)
-    print(decrypt_mhkc(encrypt_mhkc("PLZWORK", public_key), private_key))
+    # private_key = generate_private_key()
+    # public_key = create_public_key(private_key)
+    # print(decrypt_mhkc(encrypt_mhkc("PLZWORK", public_key), private_key))
 
 if __name__ == "__main__":
     main()
